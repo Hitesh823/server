@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Hitesh823/server#readme",
   "dependencies": {
+    "express": "^4.19.2",
     "nodemon": "^3.1.1"
   }
 }

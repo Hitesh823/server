@@ -1,102 +1,61 @@
-const http = require("http");
+// importing express package
+const express = require("express");
 
-const port = 8081; // local port num
+// initialisation
+const app = express();
 
-// HTTP Methods
+// application will now use json format data
+app.use(express.json());
 
-/*
->> GET: Inorder to get data from server
->> POST: Sending data to server
->> DELETE: Deleting the data from database
->> PATCH: Updating certain fields
->> PUT: Full Update
-*/
+// port num where my server listens for every req-res
+const port = 8081;
 
-const toDoList = ["learn", "apply things", "succed"];
+const toDoList = ["java", "javaScript", "Python"];
 
-http
-  .createServer((req, res) => {
-    // call back func
-    const { method, url } = req;
+// GET Method
+// http://localhost:8081/todos
+app.get("/todos", (req, res)=> {
+    // callback func
+    res.status(200).send(toDoList.toString());
+})
 
-    // console.log(method, url);
+// POST Method
+app.post("/todos", (req,res)=>{
+    let newToDoItemList = req.body.items;
+    toDoList.push(newToDoItemList);
+    res.status(201).send({
+        message: "Task Added Succesfully",
+        name: "value"
+    })
 
-    if (url === "/todos") {
-      if (method === "GET") {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.write(toDoList.toString());
-      } else if (method === "POST") {
-        let body = "";
-        req
-          .on("error", (err) => {
-            console.log(err);
-          })
-          .on("data", (chunk) => {
-            body += chunk;
-            // console.log(chunk);
-          })
-          .on("end", () => {
-            body = JSON.parse(body);
+})
 
-            let newToDo = toDoList;
-            newToDo.push(body.devtown);
-            console.log(newToDo);
-            // console.log("data: ", body);
-          });
-      } else if (method === "DELETE") {
-        let body = "";
-        req
-          .on("error", (err) => {
-            console.error(err);
-          })
-          .on("data", (chunk) => {
-            body += chunk;
-          })
-          .on("end", () => {
-            body = JSON.parse(body);
+// DELETE Method
+app.delete("/todos",(req, res)=>{
+    const itemToDelete = req.body.item;
+    toDoList.find((elem, index)=>{
+        if(elem === itemToDelete){
+            toDoList.splice(index, 1);
+        }
+    })
+    res.status(204).send({
+        message: `Deleted item "${itemToDelete}"`
+    })
+})
 
-            let deleteThisItem = body.item;
+app.all("/todos",(req,res)=>{
+    res.status(501).send("Not Implemented this feature");
+})
 
-            for (let i = 0; i < toDoList.length; i++) {
-              if (toDoList[i] === deleteThisItem) {
-                toDoList.splice(i, 1);
-                break;
-              } else {
-                console.error("Error: Match Not Found!!");
-                break;
-              }
-            }
+app.all("*",(req,res)=>{
+    res.status(501).send("Not Implemented this feature");
+})
 
-            // toDoList.find((elem, index) => {
-            //   if (elem === deleteThisItem) {
-            //     toDoList.splice(index, 1);
-            //   } else {
-            //     console.error("Error: Match Not Found!!");
-            //     // console.exit();
-            //   }
-            // });
-          });
-      } else {
-        res.writeHead(501);
-      }
-    } else {
-      res.writeHead(404);
-    }
-    res.end();
-    // res.writeHead(200, { "Content-Type": "text/html" });
-    // res.write("<h2>hey server started n u can procced :-) 123456 </h2>");
-    // res.end();
-  })
-  .listen(port, () => {
-    // call back func
-    console.log(`NodeJs Server Started Running on Port: ${port}`);
-  });
+// app.get("/todos/create",())
+// app.get("/todos/insert",())
+app.listen(port, ()=>{
+    // callback func
+    console.log(`NodeJs Server started on the port ${port}`);
+})
 
-// http:localhost:8081
-// http:localhost:8081/
-
-// http://localhost:8081/signin
-// http://localhost:8081/signup
-// http://localhost:8081/home
-// http://localhost:8081/contactUs
-// http://localhost:8081/AboutUs
+// npm i express or npm install express
